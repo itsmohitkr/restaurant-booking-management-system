@@ -1,0 +1,56 @@
+# Ignore build directories
+/target/
+out/
+
+# Ignore dependencies (if using wrapper)
+.mvn/
+!mvn/wrapper/maven-wrapper.jar
+
+# Ignore IDE-specific files
+*.iml
+*.ipr
+*.iws
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# Ignore OS-generated files
+.DS_Store
+Thumbs.db
+
+# Ignore Logs
+logs/
+*.log
+
+# Ignore environment-specific files
+.env
+application.properties
+application.yml
+application-dev.properties
+application-prod.properties
+secret.properties
+
+# Ignore test reports
+/test-output/
+/surefire-reports/
+/failsafe-reports/
+
+# Ignore compiled bytecode
+*.class
+
+# Ignore generated files
+*.war
+*.jar
+
+# Ignore temporary files
+*.tmp
+*.bak
+*.swp
+
+# Ignore database files (if any)
+*.db
+*.sqlite
+
+# Ignore Docker-specific files (if using Docker)
+docker-compose.override.yml
