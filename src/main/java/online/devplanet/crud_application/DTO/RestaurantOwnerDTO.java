@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import online.devplanet.crud_application.model.RestaurantOwner;
 
 import java.util.List;
 
@@ -29,6 +30,5 @@ public class RestaurantOwnerDTO {
     @Email(message = "Invalid email format")
     private String ownerEmail;
 
-    @NotNull(message = "Restaurant IDs cannot be empty")
-    private List<Integer> restaurantIds; // Stores list of associated restaurant IDs
+    private List<RestaurantDTO> restaurants;
 }

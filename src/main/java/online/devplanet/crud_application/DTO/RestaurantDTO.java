@@ -20,7 +20,7 @@ public class RestaurantDTO {
     private int restaurantId;
 
     @NotNull(message = "RestaurantName cannot be empty")
-    @Min(value = 3, message = "RestaurantName must be at least 1")
+    @Size(min = 3, message = "RestaurantName must be at least 3 characters long")
     private String restaurantName;
 
     @NotNull(message = "RestaurantContact cannot be empty")
@@ -32,8 +32,7 @@ public class RestaurantDTO {
     private String restaurantEmail;
 
     @NotNull(message = "RestaurantLocation cannot be empty")
-    @Min(value = 3, message = "RestaurantLocation must be at least 3")
-    @Max(value = 50, message = "RestaurantLocation must be at most 30 characters")
+    @Size(min = 3, message = "RestaurantLocation must be at least 3 characters long")
     private String restaurantLocation;
 
     @NotNull(message = "OwnerId cannot be empty")
@@ -42,6 +41,5 @@ public class RestaurantDTO {
     @NotNull(message = "RestaurantAddress cannot be empty")
     @Valid
     private RestaurantAddress restaurantAddress;
-
 
 }

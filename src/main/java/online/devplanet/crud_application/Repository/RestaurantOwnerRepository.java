@@ -1,10 +1,10 @@
 package online.devplanet.crud_application.Repository;
 
-
-import online.devplanet.crud_application.model.Tables;
+import online.devplanet.crud_application.model.RestaurantOwner;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TableRepository extends JpaRepository<Tables, Integer> {
+public interface RestaurantOwnerRepository extends JpaRepository<RestaurantOwner, Integer> {
+
 }

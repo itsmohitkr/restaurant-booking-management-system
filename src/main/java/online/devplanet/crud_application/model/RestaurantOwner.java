@@ -1,10 +1,15 @@
 package online.devplanet.crud_application.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -12,6 +17,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "restaurant_owners")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "ownerId"
+)
 public class RestaurantOwner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +30,7 @@ public class RestaurantOwner {
     private String ownerContact;
     private String ownerEmail;
 
-    @ElementCollection // This annotation allows storing a collection of basic types
-    @CollectionTable(name = "owner_restaurants", joinColumns = @JoinColumn(name = "owner_id"))
-    @Column(name = "restaurant_id")
-    private List<Integer> restaurantIds;
+    @OneToMany(mappedBy = "restaurantOwner", cascade = CascadeType.ALL)
+    private List<Restaurant> restaurants=new ArrayList<>();
+
 }
