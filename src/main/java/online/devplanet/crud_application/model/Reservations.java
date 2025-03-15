@@ -28,6 +28,8 @@ public class Reservations{
     private int noOfPeople;
     private String reservationStatus = "booked";
 
+
+
     @CreationTimestamp
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt; // Automatically set when a record is created

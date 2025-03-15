@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ItemDTO {
 
+    private int itemId; // This will be auto-generated if not provided
+
     @NotNull(message = "Item name cannot be null")
     @Size(min = 2, max = 50, message = "Item name must be between 2 and 50 characters")
     private String itemName;

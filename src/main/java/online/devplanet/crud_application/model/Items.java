@@ -21,5 +21,4 @@ public class Items {
     @JoinColumn(name = "menu_id", referencedColumnName = "menuId")
     private Menu menu;
 
-
 }
