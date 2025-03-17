@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/reservations")
+@RequestMapping("/api")
 public class ReservationController {
 
     @Autowired
     private ReservationService service;
 
 
-    @GetMapping
+    @GetMapping("/reservations")
     public ResponseEntity<List<ReservationDTO>> getAllReservations(@RequestParam(required = false) String date) {
         List<ReservationDTO> reservations;
         if (date != null && !date.isBlank()) {
@@ -32,39 +32,39 @@ public class ReservationController {
     }
 
 
-    @PostMapping
+    @PostMapping("/reservation")
     public ResponseEntity<Map<String, String>> addReservation(@Valid @RequestBody ReservationDTO reservationDTO) {
         service.addReservation(reservationDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Reservation added successfully"));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/reservation/{id}")
     public ResponseEntity<?> getReservationById(@PathVariable int id) {
         ReservationDTO reservationDTO = service.getReservationById(id);
         return ResponseEntity.status(HttpStatus.OK).body(reservationDTO);
     }
 
     // get reservation by mobile number
-    @GetMapping("/by-mobile")
+    @GetMapping("/reservation/by-mobile")
     public ResponseEntity<?> getReservationByMobileNo(@RequestParam String mobileNo) {
         List<ReservationDTO> reservationDTO = service.getReservationByMobileNo(mobileNo);
         return ResponseEntity.status(HttpStatus.OK).body(reservationDTO);
     }
 
-    @GetMapping("/by-date")
+    @GetMapping("/reservation/by-date")
     public ResponseEntity<?> getReservationByReservationDate(@RequestParam String date) {
         List<ReservationDTO> reservationDTO = service.getReservationByReservationDate(date);
         return ResponseEntity.status(HttpStatus.OK).body(reservationDTO);
     }
 
     // get reservation by reservation firstname and lastname
-    @GetMapping("/by-name")
+    @GetMapping("/reservation/by-name")
     public ResponseEntity<?> getReservationByFirstNameAndLastName(@RequestParam String firstName, @RequestParam String lastName) {
         List<ReservationDTO> reservationDTO = service.getReservationByFirstNameAndLastName(firstName, lastName);
         return ResponseEntity.status(HttpStatus.OK).body(reservationDTO);
     }
 
-    @PutMapping("/{id}/edit")
+    @PutMapping("/reservation/{id}/edit")
     public ResponseEntity<Map<String, String>> updateReservation(@PathVariable int id, @Valid @RequestBody ReservationDTO  reservationDTO) {
         ReservationDTO reservation = service.getReservationById(id);
         reservationDTO.setReservationId(id);
@@ -72,8 +72,8 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Reservation updated successfully"));
     }
 
-
-    @PutMapping("/{id}/status")
+    // will check later
+    @PutMapping("/reservation/{id}/status")
     public ResponseEntity<?> updateReservationStatus(@PathVariable int id, @Valid @RequestBody ReservationStatusDTO statusDTO) {
         ReservationDTO reservation = service.getReservationById(id);
         reservation.setReservationStatus(statusDTO.getStatus());

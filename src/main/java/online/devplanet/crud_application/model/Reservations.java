@@ -19,7 +19,6 @@ public class Reservations{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int reservationId;
-    private int userId;
     private String firstName;
     private String lastName;
     private String mobileNo;
@@ -28,7 +27,9 @@ public class Reservations{
     private int noOfPeople;
     private String reservationStatus = "booked";
 
-
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurantId")
+    private Restaurant restaurant;
 
     @CreationTimestamp
     @Column(updatable = false, nullable = false)
@@ -37,6 +38,7 @@ public class Reservations{
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt; // Updated every time a record changes
+
 
 
 }

@@ -17,9 +17,9 @@ public class ReservationDTO {
     
     private int reservationId;
 
-    @NotNull(message = "User Id cannot be null")
-    @Min(value = 1, message = "User Id must be at least 1")
-    private int userId;
+//    @NotNull(message = "User Id cannot be null")
+//    @Min(value = 1, message = "User Id must be at least 1")
+//    private int userId;
 
     @NotNull(message = "First Name cannot be null")
     @Size(min = 3, message = "First Name must have at least 3 characters")
@@ -47,5 +47,9 @@ public class ReservationDTO {
     private int noOfPeople;
 
     private String reservationStatus = "booked";
+
+    @NotNull(message = "Restaurant Id cannot be null")
+    @Min(value = 1, message = "Restaurant Id must be at least 1")
+    private int restaurantId;
 
 }

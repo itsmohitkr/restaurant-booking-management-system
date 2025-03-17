@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 public class TableDTO {
     private Integer tableId;
 
-    @NotNull(message = "User Id cannot be empty")
-    @Min(value = 1, message = "User Id must be at least 1")
-    private Integer userId;
+//    @NotNull(message = "User Id cannot be empty")
+//    @Min(value = 1, message = "User Id must be at least 1")
+//    private Integer userId;
 
     @NotNull(message = "Table Name cannot be empty")
     private String tableName;
@@ -26,4 +26,7 @@ public class TableDTO {
     @Min(value = 0, message = "Reservation Id must be greater than or equal to 0")
     private Integer reservationId;
 
+    @NotNull(message = "Restaurant Id cannot be empty")
+    @Min(value = 1, message = "Restaurant Id must be at least 1")
+    private Integer restaurantId;
 }

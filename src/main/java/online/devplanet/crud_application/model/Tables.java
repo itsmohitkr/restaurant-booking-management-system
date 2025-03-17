@@ -19,7 +19,6 @@ public class Tables {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int tableId;
-    private int userId;
     private String tableName;
     private int capacity;
     private int reservationId=0;
@@ -31,5 +30,9 @@ public class Tables {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt; // Updated every time a record changes
+
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurantId")
+    private Restaurant restaurant;
 
 }

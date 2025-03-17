@@ -13,9 +13,11 @@ import java.util.List;
 public interface ReservationMapper {
 
     @Mapping(target = "reservationDate", source = "reservationDate", qualifiedByName = "localDateToString")
+    @Mapping(source = "restaurantId", target = "restaurant.restaurantId")
     Reservations toEntity(ReservationDTO reservationDTO);
 
     @Mapping(target = "reservationDate", source = "reservationDate", qualifiedByName = "stringToLocalDate")
+    @Mapping(source = "restaurant.restaurantId", target = "restaurantId")
     ReservationDTO toDTO(Reservations reservations);
 
     @Named("stringToLocalDate")

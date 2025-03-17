@@ -56,6 +56,4 @@ public class ItemController {
         return ResponseEntity.status(HttpStatus.OK).body("Item deleted successfully");
     }
 
-
-
 }
