@@ -60,5 +60,4 @@ public class RestaurantOwnerController {
         service.updateRestaurantOwner(id, restaurantOwnerDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Restaurant Owner updated successfully");
     }
-
 }
