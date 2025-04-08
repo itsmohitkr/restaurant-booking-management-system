@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface MenuRepository extends JpaRepository<Menu, Integer> {
 
     Menu findByRestaurant_RestaurantId(int restaurantId);
+
+    Menu findByMenuIdAndRestaurant_RestaurantId(int menuId, int restaurantId);
 }

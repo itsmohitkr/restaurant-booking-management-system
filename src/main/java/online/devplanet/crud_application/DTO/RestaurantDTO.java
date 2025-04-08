@@ -35,8 +35,9 @@ public class RestaurantDTO {
     @Size(min = 3, message = "RestaurantLocation must be at least 3 characters long")
     private String restaurantLocation;
 
-    @NotNull(message = "OwnerId cannot be empty")
-    private Integer ownerId;
+//    @NotNull(message = "OwnerId cannot be empty")
+//    private Integer ownerId;
+
 
     @NotNull(message = "RestaurantAddress cannot be empty")
     @Valid

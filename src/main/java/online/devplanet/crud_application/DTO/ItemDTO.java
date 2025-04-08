@@ -24,7 +24,7 @@ public class ItemDTO {
     @Positive(message = "Item price must be greater than zero")
     private Double itemPrice;
 
-    @NotNull(message = "Menu ID cannot be null")
-    @Min(value = 1, message = "Menu ID must be a positive integer")
-    private Integer menuId;
+//    @NotNull(message = "Menu ID cannot be null")
+//    @Min(value = 1, message = "Menu ID must be a positive integer")
+//    private Integer menuId;
 }

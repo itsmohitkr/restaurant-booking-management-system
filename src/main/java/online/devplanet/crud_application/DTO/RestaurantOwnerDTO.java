@@ -11,6 +11,7 @@ import online.devplanet.crud_application.CustomAnnotations.Annotations.Trimmed;
 import online.devplanet.crud_application.model.RestaurantOwner;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -33,6 +34,10 @@ public class RestaurantOwnerDTO {
     @Email(message = "Invalid email format")
     @Trimmed
     private String ownerEmail;
+
+    @NotNull(message = "Owner password cannot be empty")
+    @Size(min = 8, message = "Owner password must be at least 8 characters long")
+    private String ownerPassword;
 
     private List<RestaurantDTO> restaurants;
 }

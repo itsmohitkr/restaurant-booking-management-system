@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -27,6 +28,9 @@ public class RestaurantOwner {
     private String ownerName;
     private String ownerContact;
     private String ownerEmail;
+    private String ownerPassword;
+
+    private String ownerRole = "ADMIN";
 
     @OneToMany(mappedBy = "restaurantOwner", cascade = CascadeType.ALL)
     private List<Restaurant> restaurants=new ArrayList<>();

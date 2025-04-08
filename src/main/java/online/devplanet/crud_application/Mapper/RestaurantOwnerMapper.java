@@ -31,7 +31,7 @@ public interface RestaurantOwnerMapper {
                     dto.setRestaurantContact(restaurant.getRestaurantContact());
                     dto.setRestaurantEmail(restaurant.getRestaurantEmail());
                     dto.setRestaurantLocation(restaurant.getRestaurantLocation());
-                    dto.setOwnerId(restaurant.getRestaurantOwner().getOwnerId());
+//                    dto.setOwnerId(restaurant.getRestaurantOwner().getOwnerId());
                     dto.setRestaurantAddress(restaurant.getRestaurantAddress());
                     return dto;
                 })

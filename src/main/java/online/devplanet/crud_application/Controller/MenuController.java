@@ -12,27 +12,22 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/restaurant")
 public class MenuController {
 
 
     @Autowired
     private MenuService service;
 
-    @GetMapping("/menu")
-    public ResponseEntity<List<MenuDTO>> getAllMenu() {
-        return ResponseEntity.ok(service.getAllMenu().getBody());
-    }
-
     // create new menu
-    @GetMapping("/restaurants/{restaurantId}/menu")
+    @GetMapping("/{restaurantId}/menu")
     public ResponseEntity<?> getMenu(@PathVariable int restaurantId) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getMenu(restaurantId));
     }
 
-    @PostMapping("/menu")
-    public ResponseEntity<?> addMenu(@Valid @RequestBody MenuDTO menuDTO) {
-        service.addMenu(menuDTO);
+    @PostMapping("/{restaurantId}/menu")
+    public ResponseEntity<?> addMenu(@PathVariable int restaurantId) {
+        service.addMenu(restaurantId);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Menu added successfully"));
     }
 

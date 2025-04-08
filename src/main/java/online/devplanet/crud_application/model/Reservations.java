@@ -39,6 +39,4 @@ public class Reservations{
     @Column(nullable = false)
     private LocalDateTime updatedAt; // Updated every time a record changes
 
-
-
 }

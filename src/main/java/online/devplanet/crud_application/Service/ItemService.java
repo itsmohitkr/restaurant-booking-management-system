@@ -1,15 +1,18 @@
 package online.devplanet.crud_application.Service;
 
 import jakarta.validation.Valid;
+import online.devplanet.crud_application.Config.UserAuthenticationToken;
 import online.devplanet.crud_application.DTO.ItemDTO;
 import online.devplanet.crud_application.Mapper.ItemMapper;
 import online.devplanet.crud_application.Repository.ItemRepository;
 import online.devplanet.crud_application.Repository.MenuRepository;
+import online.devplanet.crud_application.Repository.RestaurantRepository;
 import online.devplanet.crud_application.exception.CustomException;
 import online.devplanet.crud_application.model.Items;
 import online.devplanet.crud_application.model.Menu;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,39 +27,57 @@ public class ItemService {
     private MenuRepository menuRepository;
 
     @Autowired
+    private RestaurantRepository restaurantRepository;
+    @Autowired
     private ItemMapper itemMapper;
 
-    public List<ItemDTO> getAllItems(int menuId) {
-        // check if menu exists
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId));
-        return itemMapper.toDTOList(itemRepository.findByMenu_MenuId(menuId));
 
+    // get the owner id from the security context
+    private int getOwnerIdFromSecurityContext() {
+        UserAuthenticationToken userAuthenticationToken = (UserAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return userAuthenticationToken.getOwnerId();
+    }
+
+    public List<ItemDTO> getAllItems(int menuId, int restaurantId) {
+        int ownerId = getOwnerIdFromSecurityContext();
+        // check if the restaurant belongs to the owner
+        if (restaurantRepository.findByRestaurantIdAndRestaurantOwner_OwnerId(restaurantId, ownerId) == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant not found with id: " + restaurantId);
+        }
+        Menu menu = menuRepository.findByMenuIdAndRestaurant_RestaurantId(menuId,restaurantId);
+        if (menu == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId);
+        }
+        return itemMapper.toDTOList(itemRepository.findAllByMenu_MenuId(menuId));
 
     }
 
-    public void addItem(int menuId, ItemDTO itemDTO) {
-        // check if menu_id is equal to the menu_id present in the item DQ
-        if (menuId != itemDTO.getMenuId()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "Menu id in path variable and item do not match");
+    public void addItem(int restaurantId, int menuId, @Valid ItemDTO itemDTO) {
+        int ownerId = getOwnerIdFromSecurityContext();
+
+        if (restaurantRepository.findByRestaurantIdAndRestaurantOwner_OwnerId(restaurantId, ownerId) == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant not found with id: " + restaurantId);
         }
-        // check if menu exists
+
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId));
 
-        itemRepository.save(itemMapper.toEntity(itemDTO));
 
+        Items item = itemMapper.toEntity(itemDTO);
+        item.setMenu(menu);
+        itemRepository.save(item);
     }
 
-    public void updateItem(int menuId, int itemId, @Valid ItemDTO itemDTO) {
-
-        if (menuId != itemDTO.getMenuId()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "Menu id in path variable and item do not match");
+    public void updateItem( int restaurantId, int menuId, int itemId, @Valid ItemDTO itemDTO) {
+        int ownerId = getOwnerIdFromSecurityContext();
+        // check if the restaurant belongs to the owner
+        if (restaurantRepository.findByRestaurantIdAndRestaurantOwner_OwnerId(restaurantId, ownerId) == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant not found with id: " + restaurantId);
         }
-        // check if menu exists
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId));
-        // check if item exists in the menu
+        Menu menu = menuRepository.findByMenuIdAndRestaurant_RestaurantId(menuId, restaurantId);
+        if (menu == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId);
+        }
 
         Items existingItem = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "Item not found with ID: " + itemId));
 
@@ -66,34 +87,51 @@ public class ItemService {
         itemRepository.save(updatedItem);
     }
 
-    public ItemDTO getItemById(int menuId, int itemId) {
-        // check if menu exists
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId));
-        // check if item exists in the menu
-        Items item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "Item not found with ID: " + itemId));
+    public ItemDTO getItemById( int restaurantId, int menuId, int itemId) {
+        int ownerId = getOwnerIdFromSecurityContext();
+        // check if the restaurant belongs to the owner
+        if (restaurantRepository.findByRestaurantIdAndRestaurantOwner_OwnerId(restaurantId, ownerId) == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant not found with id: " + restaurantId);
+        }
+        Menu menu = menuRepository.findByMenuIdAndRestaurant_RestaurantId(menuId, restaurantId);
+        if (menu == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId);
+        }
+
+        Items item = itemRepository.findById(itemId).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "Item not found with ID: " + itemId));
+
 
         return itemMapper.toDTO(item);
     }
 
-    public List<ItemDTO> searchItem(int menuId, String keyword) {
-        // check if menu exists
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId));
-        // search for items with name, description
-        return itemMapper.toDTOList(itemRepository.findByMenu_MenuIdAndItemNameContainingOrItemDescriptionContaining(menuId, keyword, keyword));
+    public List<ItemDTO> searchItem( int restaurantId, int menuId, String keyword) {
+        int ownerId = getOwnerIdFromSecurityContext();
+        // check if the restaurant belongs to the owner
+        if (restaurantRepository.findByRestaurantIdAndRestaurantOwner_OwnerId(restaurantId, ownerId) == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant not found with id: " + restaurantId);
+        }
+        Menu menu = menuRepository.findByMenuIdAndRestaurant_RestaurantId(menuId, restaurantId);
+        if (menu == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId);
+        }
+
+        return itemMapper.toDTOList(itemRepository.findAllByMenu_MenuIdAndItemNameContainingOrItemDescriptionContaining(menuId, keyword, keyword));
     }
 
-    public void deleteItem(int menuId, int itemId) {
-        // check if menu exists
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId));
-        // check if item exists in the menu
-        Items item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "Item not found with ID: " + itemId));
-        if(item.getMenu().getMenuId() != menuId) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "Item does not belong to the menu");
+    public void deleteItem(int menuId, int itemId, int restaurantId) {
+        int ownerId = getOwnerIdFromSecurityContext();
+        // check if the restaurant belongs to the owner
+        if (restaurantRepository.findByRestaurantIdAndRestaurantOwner_OwnerId(restaurantId, ownerId) == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant not found with id: " + restaurantId);
+        }
+        // check if the menu belongs to the restaurant
+        if (menuRepository.findByMenuIdAndRestaurant_RestaurantId(menuId, restaurantId) == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Menu not found with id: " + menuId);
+        }
+
+        Items item = itemRepository.findByItemIdAndMenu_MenuId(itemId, menuId);
+        if (item == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Item not found with id: " + itemId);
         }
         itemRepository.delete(item);
 

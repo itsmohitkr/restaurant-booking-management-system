@@ -1,6 +1,6 @@
 package online.devplanet.crud_application.Service;
 
-import jakarta.validation.Valid;
+import online.devplanet.crud_application.Config.UserAuthenticationToken;
 import online.devplanet.crud_application.DTO.RestaurantOwnerDTO;
 import online.devplanet.crud_application.Mapper.RestaurantOwnerMapper;
 import online.devplanet.crud_application.Repository.RestaurantOwnerRepository;
@@ -8,6 +8,7 @@ import online.devplanet.crud_application.exception.CustomException;
 import online.devplanet.crud_application.model.RestaurantOwner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,10 +22,17 @@ public class RestaurantOwnerService {
     @Autowired
     private RestaurantOwnerMapper mapper;
 
-
-    public List<RestaurantOwnerDTO> getAllRestaurantOwners() {
-        return mapper.toDTOList(restaurantOwnerRepository.findAll());
+    // get the owner id from the security context
+    private int getOwnerIdFromSecurityContext() {
+        UserAuthenticationToken userAuthenticationToken = (UserAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return userAuthenticationToken.getOwnerId();
     }
+
+
+//    public List<RestaurantOwnerDTO> getAllRestaurantOwners() {
+//        int ownerId = getOwnerIdFromSecurityContext();
+//        return mapper.toDTOList(restaurantOwnerRepository.findAllByOwnerId(ownerId));
+//    }
 
 
     private List<RestaurantOwnerDTO> getRestaurantOwnerByNameAndEmail(String ownerName, String ownerEmail) {
@@ -36,11 +44,13 @@ public class RestaurantOwnerService {
     }
 
     public RestaurantOwnerDTO getRestaurantOwnerById(int id) {
-        RestaurantOwner restaurantOwner = restaurantOwnerRepository.findById(id)
-                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST,"Restaurant Owner not found with id: " + id));
+
+        RestaurantOwner restaurantOwner = restaurantOwnerRepository.findByOwnerId(id);
+        if (restaurantOwner == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant Owner not found with id: " + id);
+        }
         return mapper.toDTO(restaurantOwner);
     }
-
 
     public void addRestaurantOwner(RestaurantOwnerDTO restaurantOwnerDTO) {
         // check if restaurant owner already exists
@@ -52,13 +62,13 @@ public class RestaurantOwnerService {
         restaurantOwnerRepository.save(restaurantOwner);
     }
 
-    public List<RestaurantOwnerDTO> getRestaurantOwnerByEmail(String ownerEmail) {
-        List<RestaurantOwner> restaurantOwner = restaurantOwnerRepository.findByOwnerEmail(ownerEmail);
-        if (restaurantOwner.isEmpty()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant Owner not found with email: " + ownerEmail);
-        }
-        return mapper.toDTOList(restaurantOwner);
-    }
+//    public List<RestaurantOwnerDTO> getRestaurantOwnerByEmail(String ownerEmail) {
+//        List<RestaurantOwner> restaurantOwner = restaurantOwnerRepository.findByOwnerEmail(ownerEmail);
+//        if (restaurantOwner.isEmpty()) {
+//            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant Owner not found with email: " + ownerEmail);
+//        }
+//        return mapper.toDTOList(restaurantOwner);
+//    }
 
     public List<RestaurantOwnerDTO> getRestaurantOwnerByName(String ownerName) {
         List<RestaurantOwner> restaurantOwners = restaurantOwnerRepository.findByOwnerName(ownerName);
@@ -68,18 +78,37 @@ public class RestaurantOwnerService {
         return mapper.toDTOList(restaurantOwners);
     }
 
-    public void updateRestaurantOwner(int id, @Valid RestaurantOwnerDTO restaurantOwnerDTO) {
-        // check if id in the request body matches the id in the path
-        if (id != restaurantOwnerDTO.getOwnerId()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "Id in the request body does not match the id in the path");
-        }
+    public void updateRestaurantOwner(RestaurantOwnerDTO restaurantOwnerDTO) {
+        // check if restaurant owner already exists
+        int ownerId = getOwnerIdFromSecurityContext();
+
+//        if (id != restaurantOwnerDTO.getOwnerId()) {
+//            throw new CustomException(HttpStatus.BAD_REQUEST, "Id in the request body does not match the id in the path");
+//        }
         // check if restaurant owner exists
-        if (!restaurantOwnerRepository.existsById(id)) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant Owner not found with id: " + id);
+        if (!restaurantOwnerRepository.existsById(ownerId)) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant Owner not found with id: " + ownerId);
+        }
+        RestaurantOwner restaurantOwner = mapper.toEntity(restaurantOwnerDTO);
+        restaurantOwner.setOwnerId(ownerId);
+        restaurantOwnerRepository.save(restaurantOwner);
+    }
+
+    public RestaurantOwnerDTO getRestaurantOwnerByOwnerEmail(String ownerEmail) {
+        RestaurantOwner restaurantOwners = restaurantOwnerRepository.findByOwnerEmail(ownerEmail);
+        if (restaurantOwners == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant Owner not found with email: " + ownerEmail);
         }
 
-        RestaurantOwner restaurantOwner = mapper.toEntity(restaurantOwnerDTO);
-        restaurantOwner.setOwnerId(id);
-        restaurantOwnerRepository.save(restaurantOwner);
+        return mapper.toDTO(restaurantOwners);
+    }
+
+    public RestaurantOwnerDTO getRestaurantOwner() {
+        int ownerId = getOwnerIdFromSecurityContext();
+        RestaurantOwner restaurantOwner = restaurantOwnerRepository.findByOwnerId(ownerId);
+        if (restaurantOwner == null) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Restaurant Owner not found with id: " + ownerId);
+        }
+        return mapper.toDTO(restaurantOwner);
     }
 }

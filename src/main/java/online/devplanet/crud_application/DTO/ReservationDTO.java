@@ -47,9 +47,9 @@ public class ReservationDTO {
     private int noOfPeople;
 
     private String reservationStatus = "booked";
-
-    @NotNull(message = "Restaurant Id cannot be null")
-    @Min(value = 1, message = "Restaurant Id must be at least 1")
+//
+//    @NotNull(message = "Restaurant Id cannot be null")
+//    @Min(value = 1, message = "Restaurant Id must be at least 1")
     private int restaurantId;
 
 }

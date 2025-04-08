@@ -11,48 +11,48 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/menu/{menuId}")
+@RequestMapping("/api/restaurant")
 public class ItemController {
 
     @Autowired
     private ItemService itemService;
 
     // get all items
-    @GetMapping("/items")
-    public ResponseEntity<List<ItemDTO>> getAllItems(@PathVariable int menuId) {
-        List<ItemDTO> items = itemService.getAllItems(menuId);
+    @GetMapping("/{restaurantId}/menu/{menuId}/items")
+    public ResponseEntity<List<ItemDTO>> getAllItems(@PathVariable int restaurantId, @PathVariable int menuId) {
+        List<ItemDTO> items = itemService.getAllItems(menuId, restaurantId);
         return ResponseEntity.status(HttpStatus.OK).body(items);
     }
 
     // create item
-    @PostMapping("/item")
-    public ResponseEntity<?> addItem(@PathVariable int menuId, @Valid @RequestBody ItemDTO itemDTO) {
-        itemService.addItem(menuId, itemDTO);
+    @PostMapping("/{restaurantId}/menu/{menuId}/item")
+    public ResponseEntity<?> addItem(@PathVariable int restaurantId, @PathVariable int menuId, @Valid @RequestBody ItemDTO itemDTO) {
+        itemService.addItem(restaurantId, menuId, itemDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body("Item added successfully");
     }
 
-    @PutMapping("/item/{itemId}")
-    public ResponseEntity<?> updateItem(@PathVariable int menuId, @PathVariable int itemId, @Valid @RequestBody ItemDTO itemDTO) {
-        itemService.updateItem(menuId, itemId, itemDTO);
+    @PutMapping("/{restaurantId}/menu/{menuId}/item/{itemId}")
+    public ResponseEntity<?> updateItem(@PathVariable int restaurantId, @PathVariable int menuId, @PathVariable int itemId, @Valid @RequestBody ItemDTO itemDTO) {
+        itemService.updateItem(restaurantId, menuId, itemId, itemDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Item updated successfully");
     }
 
-    @GetMapping("/item/{itemId}")
-    public ResponseEntity<?> getItemById(@PathVariable int menuId, @PathVariable int itemId) {
-        ItemDTO itemDTO = itemService.getItemById(menuId, itemId);
+    @GetMapping("/{restaurantId}/menu/{menuId}/item/{itemId}")
+    public ResponseEntity<?> getItemById(@PathVariable int restaurantId, @PathVariable int menuId, @PathVariable int itemId) {
+        ItemDTO itemDTO = itemService.getItemById(restaurantId, menuId, itemId);
         return ResponseEntity.status(HttpStatus.OK).body(itemDTO);
     }
 
     // search by any keyword
-    @GetMapping("/items/search")
-    public ResponseEntity<?> searchItem(@PathVariable int menuId, @RequestParam String keyword) {
-        List<ItemDTO> items = itemService.searchItem(menuId, keyword);
+    @GetMapping("/{restaurantId}/menu/{menuId}/item/search")
+    public ResponseEntity<?> searchItem(@PathVariable int restaurantId, @PathVariable int menuId, @RequestParam String keyword) {
+        List<ItemDTO> items = itemService.searchItem(restaurantId, menuId, keyword);
         return ResponseEntity.status(HttpStatus.OK).body(items);
     }
 
-    @DeleteMapping("/item/{itemId}")
-    public ResponseEntity<?> deleteItem(@PathVariable int menuId, @PathVariable int itemId) {
-        itemService.deleteItem(menuId, itemId);
+    @DeleteMapping("/{restaurantId}/menu/{menuId}/item/{itemId}")
+    public ResponseEntity<?> deleteItem(@PathVariable int menuId, @PathVariable int itemId, @PathVariable int restaurantId) {
+        itemService.deleteItem(menuId, itemId, restaurantId);
         return ResponseEntity.status(HttpStatus.OK).body("Item deleted successfully");
     }
 
